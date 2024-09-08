@@ -48,31 +48,51 @@ namespace SampleBlobProject.Services
             var blobs = blobContainerClient.GetBlobsAsync();
 
             var blobList = new List<Blob>();
+            string sasContainerSignature = "";
+
+            // sas builder at the container level
+
+            if (blobContainerClient.CanGenerateSasUri)
+            {
+                BlobSasBuilder sasBuilder = new BlobSasBuilder()
+                {
+                    BlobContainerName = blobContainerClient.Name,
+                    Resource = "c"
+                };
+
+                sasBuilder.ExpiresOn = DateTimeOffset.UtcNow.AddHours(1);
+
+                sasBuilder.SetPermissions(BlobAccountSasPermissions.Read | BlobAccountSasPermissions.Add);
+                // this will generate the uri with sas token
+                // image gets displayed even if the container is private
+                sasContainerSignature = blobContainerClient.GenerateSasUri(sasBuilder).AbsoluteUri.Split('?')[1].ToString();
+            }
+
 
             await foreach (var item in blobs)
             {
                 var blobClient = blobContainerClient.GetBlobClient(item.Name);
                 Blob blobInd = new Blob()
                 {
-                    Uri = blobClient.Uri.AbsoluteUri
-                };
+                    Uri = blobClient.Uri.AbsoluteUri + "?" + sasContainerSignature
+				};
 
-                if(blobClient.CanGenerateSasUri)
-                {
-                    BlobSasBuilder sasBuilder = new BlobSasBuilder()
-                    {
-                        BlobContainerName = blobClient.GetParentBlobContainerClient().Name,
-                        BlobName = blobClient.Name,
-                        Resource = "b"
-                    };
+                //if(blobClient.CanGenerateSasUri)
+                //{
+                //    BlobSasBuilder sasBuilder = new BlobSasBuilder()
+                //    {
+                //        BlobContainerName = blobClient.GetParentBlobContainerClient().Name,
+                //        BlobName = blobClient.Name,
+                //        Resource = "b"
+                //    };
 
-                    sasBuilder.ExpiresOn = DateTimeOffset.UtcNow.AddHours(1);
+                //    sasBuilder.ExpiresOn = DateTimeOffset.UtcNow.AddHours(1);
 
-                    sasBuilder.SetPermissions(BlobAccountSasPermissions.Read | BlobAccountSasPermissions.Add);
-                    // this will generate the uri with sas token
-                    // image gets displayed even if the container is private
-                    blobInd.Uri = blobClient.GenerateSasUri(sasBuilder).AbsoluteUri;
-                }
+                //    sasBuilder.SetPermissions(BlobAccountSasPermissions.Read | BlobAccountSasPermissions.Add);
+                //    // this will generate the uri with sas token
+                //    // image gets displayed even if the container is private
+                //    blobInd.Uri = blobClient.GenerateSasUri(sasBuilder).AbsoluteUri;
+                //}
 
                 BlobProperties blobProperties = await blobClient.GetPropertiesAsync();
 
