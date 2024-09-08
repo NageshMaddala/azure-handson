@@ -1,6 +1,8 @@
 ﻿
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
+using Azure.Storage.Sas;
 using SampleBlobProject.Models;
 
 namespace SampleBlobProject.Services
@@ -54,6 +56,23 @@ namespace SampleBlobProject.Services
                 {
                     Uri = blobClient.Uri.AbsoluteUri
                 };
+
+                if(blobClient.CanGenerateSasUri)
+                {
+                    BlobSasBuilder sasBuilder = new BlobSasBuilder()
+                    {
+                        BlobContainerName = blobClient.GetParentBlobContainerClient().Name,
+                        BlobName = blobClient.Name,
+                        Resource = "b"
+                    };
+
+                    sasBuilder.ExpiresOn = DateTimeOffset.UtcNow.AddHours(1);
+
+                    sasBuilder.SetPermissions(BlobAccountSasPermissions.Read | BlobAccountSasPermissions.Add);
+                    // this will generate the uri with sas token
+                    // image gets displayed even if the container is private
+                    blobInd.Uri = blobClient.GenerateSasUri(sasBuilder).AbsoluteUri;
+                }
 
                 BlobProperties blobProperties = await blobClient.GetPropertiesAsync();
 
