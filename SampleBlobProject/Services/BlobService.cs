@@ -39,6 +39,35 @@ namespace SampleBlobProject.Services
             return blobString;
         }
 
+        public async Task<List<Blob>> GetAllBlobsWithUri(string containerName)
+        {
+            BlobContainerClient blobContainerClient = _blobClient.GetBlobContainerClient(containerName);
+
+            var blobs = blobContainerClient.GetBlobsAsync();
+
+            var blobList = new List<Blob>();
+
+            await foreach (var item in blobs)
+            {
+                var blobClient = blobContainerClient.GetBlobClient(item.Name);
+                Blob blobInd = new Blob()
+                {
+                    Uri = blobClient.Uri.AbsoluteUri
+                };
+
+                BlobProperties blobProperties = await blobClient.GetPropertiesAsync();
+
+                if (blobProperties.Metadata.ContainsKey("title"))
+                    blobInd.Title = blobProperties.Metadata["title"];
+
+                if (blobProperties.Metadata.ContainsKey("comment"))
+                    blobInd.Comment = blobProperties.Metadata["comment"];
+
+                blobList.Add(blobInd);
+            }
+            return blobList;
+        }
+
         public async Task<string> GetBlob(string name, string containerName)
         {
             BlobContainerClient blobContainerClient = _blobClient.GetBlobContainerClient(containerName);
@@ -67,9 +96,10 @@ namespace SampleBlobProject.Services
 
             var result = await blobClient.UploadAsync(file.OpenReadStream(), httpHeaders, metaData);
 
-            metaData.Remove("title");
+            // Below code to remove meta-data
+            //metaData.Remove("title");
 
-            await blobClient.SetMetadataAsync(metaData);
+            //await blobClient.SetMetadataAsync(metaData);
 
             if (result != null)
             {

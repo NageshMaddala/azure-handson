@@ -8,12 +8,13 @@ namespace SampleBlobProject.Controllers
     public class HomeController : Controller
     {
         private readonly IContainerService _containerService;
+        private readonly IBlobService _blobService;
 
-        public HomeController(IContainerService containerService, ILogger<HomeController> logger)
+        public HomeController(IContainerService containerService, ILogger<HomeController> logger, IBlobService blobService)
         {
             _containerService = containerService;
 			_logger = logger;
-
+            _blobService = blobService;
 		}
 
 		private readonly ILogger<HomeController> _logger;
@@ -27,6 +28,13 @@ namespace SampleBlobProject.Controllers
         {
             return View();
         }
+
+        public async Task<IActionResult> Images()
+        {
+            return View(await _blobService.GetAllBlobsWithUri("privatecontainer"));
+        }
+
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
