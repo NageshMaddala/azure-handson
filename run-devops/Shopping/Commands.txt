@@ -1,0 +1,5 @@
+docker ps
+docker build -t shoppingapp .
+docker images
+ docker rmi 66
+ docker images --ls
