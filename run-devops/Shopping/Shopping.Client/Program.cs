@@ -9,6 +9,12 @@ namespace Shopping.Client
 			// Add services to the container.
 			builder.Services.AddControllersWithViews();
 
+			// Add/Register HttpClient
+			builder.Services.AddHttpClient("ShoppingAPIClient", client =>
+			{
+				client.BaseAddress = new Uri("http://localhost:5000"); // Shopping.API url
+			});
+
 			var app = builder.Build();
 
 			// Configure the HTTP request pipeline.
