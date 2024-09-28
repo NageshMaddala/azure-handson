@@ -1,3 +1,5 @@
+using Shopping.API.Data;
+
 namespace Shopping.API
 {
     public class Program
@@ -9,6 +11,7 @@ namespace Shopping.API
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddScoped<ProductContext>();
 
             var app = builder.Build();
 
