@@ -67,3 +67,7 @@ kubectl delete deployment mongo-depl
 kubectl get pod --watch
 kubectl get replicaset
 ---------
+
+dashboard
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
