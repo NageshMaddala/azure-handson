@@ -71,3 +71,15 @@ kubectl get replicaset
 dashboard
 
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
+
+
+for admin portal
+username is username
+password is password
+
+
+config map to store connection string
+it is similar to secrets
+
+kubectl delete -f. 
+-- deletes all the resources in the current directory

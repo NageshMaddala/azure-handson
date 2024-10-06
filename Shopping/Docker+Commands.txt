@@ -44,3 +44,15 @@ docker stop $(docker ps -aq)
 docker rm $(docker ps -aq)
 docker rmi $(docker images -q) -f
 docker system prune
+
+---
+docker-compose -f .\docker-compose.yml -f .\docker-compose.override.yml down
+docker tag 90393fe87df2 nageshvmrtech/shoppingclient
+docker tag 9b60608820d3 nageshvmrtech/shoppingapi
+docker login
+docker push nageshvmrtech/shoppingclient
+docker push nageshvmrtech/shoppingapi
+
+---
+docker rmi 90393fe87df2 -f
+docker rmi 9b60608820d3 -f
